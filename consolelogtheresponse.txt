@@ -1,0 +1,249 @@
+{
+    "TimeStampToken": {
+        "blockName": "SEQUENCE",
+        "blockLength": 0,
+        "error": "",
+        "warnings": [],
+        "valueBeforeDecode": "",
+        "idBlock": {
+            "blockName": "identificationBlock",
+            "blockLength": 0,
+            "error": "",
+            "warnings": [],
+            "valueBeforeDecode": "",
+            "isHexOnly": false,
+            "valueHex": "",
+            "tagClass": 1,
+            "tagNumber": 16,
+            "isConstructed": true
+        },
+        "lenBlock": {
+            "blockName": "lengthBlock",
+            "blockLength": 0,
+            "error": "",
+            "warnings": [],
+            "valueBeforeDecode": "",
+            "isIndefiniteForm": false,
+            "longFormUsed": false,
+            "length": 0
+        },
+        "valueBlock": {
+            "blockName": "ConstructedValueBlock",
+            "blockLength": 0,
+            "error": "",
+            "warnings": [],
+            "valueBeforeDecode": "",
+            "isIndefiniteForm": false,
+            "value": [
+                {
+                    "blockName": "OBJECT IDENTIFIER",
+                    "blockLength": 0,
+                    "error": "",
+                    "warnings": [],
+                    "valueBeforeDecode": "",
+                    "idBlock": {
+                        "blockName": "identificationBlock",
+                        "blockLength": 0,
+                        "error": "",
+                        "warnings": [],
+                        "valueBeforeDecode": "",
+                        "isHexOnly": false,
+                        "valueHex": "",
+                        "tagClass": 1,
+                        "tagNumber": 6,
+                        "isConstructed": false
+                    },
+                    "lenBlock": {
+                        "blockName": "lengthBlock",
+                        "blockLength": 0,
+                        "error": "",
+                        "warnings": [],
+                        "valueBeforeDecode": "",
+                        "isIndefiniteForm": false,
+                        "longFormUsed": false,
+                        "length": 0
+                    },
+                    "valueBlock": {
+                        "blockName": "ObjectIdentifierValueBlock",
+                        "blockLength": 0,
+                        "error": "",
+                        "warnings": [],
+                        "valueBeforeDecode": "",
+                        "value": "1.2.840.113549.1.7.2",
+                        "sidArray": [
+                            {
+                                "blockName": "sidBlock",
+                                "blockLength": 0,
+                                "error": "",
+                                "warnings": [],
+                                "valueBeforeDecode": "",
+                                "isHexOnly": false,
+                                "valueHex": "",
+                                "valueDec": 42,
+                                "isFirstSid": true
+                            },
+                            {
+                                "blockName": "sidBlock",
+                                "blockLength": 0,
+                                "error": "",
+                                "warnings": [],
+                                "valueBeforeDecode": "",
+                                "isHexOnly": false,
+                                "valueHex": "",
+                                "valueDec": 840,
+                                "isFirstSid": false
+                            },
+                            {
+                                "blockName": "sidBlock",
+                                "blockLength": 0,
+                                "error": "",
+                                "warnings": [],
+                                "valueBeforeDecode": "",
+                                "isHexOnly": false,
+                                "valueHex": "",
+                                "valueDec": 113549,
+                                "isFirstSid": false
+                            },
+                            {
+                                "blockName": "sidBlock",
+                                "blockLength": 0,
+                                "error": "",
+                                "warnings": [],
+                                "valueBeforeDecode": "",
+                                "isHexOnly": false,
+                                "valueHex": "",
+                                "valueDec": 1,
+                                "isFirstSid": false
+                            },
+                            {
+                                "blockName": "sidBlock",
+                                "blockLength": 0,
+                                "error": "",
+                                "warnings": [],
+                                "valueBeforeDecode": "",
+                                "isHexOnly": false,
+                              …f07c5751e8210449b0797ec8e1ad5fae8c02abe80130c31fdbd0016b039ac26df2e3a3e422d75570987e155775efd3e1ff",
+                                                                        "isConstructed": false
+                                                                    },
+                                                                    "name": "",
+                                                                    "optional": false
+                                                                }
+                                                            ]
+                                                        },
+                                                        "name": "",
+                                                        "optional": false
+                                                    }
+                                                ]
+                                            },
+                                            "name": "",
+                                            "optional": false
+                                        }
+                                    ]
+                                },
+                                "name": "",
+                                "optional": false
+                            }
+                        ]
+                    },
+                    "name": "",
+                    "optional": false
+                }
+            ]
+        },
+        "name": "",
+        "optional": false
+    },
+    "messageImprint": {
+        "hashAlgorithm": {
+            "algorithmId": "2.16.840.1.101.3.4.2.1",
+            "algorithmParams": {
+                "blockName": "NULL",
+                "blockLength": 2,
+                "error": "",
+                "warnings": [],
+                "valueBeforeDecode": "0500",
+                "idBlock": {
+                    "blockName": "identificationBlock",
+                    "blockLength": 1,
+                    "error": "",
+                    "warnings": [],
+                    "valueBeforeDecode": "",
+                    "isHexOnly": false,
+                    "valueHex": "",
+                    "tagClass": 1,
+                    "tagNumber": 5,
+                    "isConstructed": false
+                },
+                "lenBlock": {
+                    "blockName": "lengthBlock",
+                    "blockLength": 1,
+                    "error": "",
+                    "warnings": [],
+                    "valueBeforeDecode": "",
+                    "isIndefiniteForm": false,
+                    "longFormUsed": false,
+                    "length": 0
+                },
+                "valueBlock": {
+                    "blockName": "valueBlock",
+                    "blockLength": 0,
+                    "error": "",
+                    "warnings": [],
+                    "valueBeforeDecode": ""
+                },
+                "name": "",
+                "optional": false
+            }
+        },
+        "hashedMessage": {
+            "blockName": "OCTET STRING",
+            "blockLength": 34,
+            "error": "",
+            "warnings": [],
+            "valueBeforeDecode": "0420b1c414a9ac76884de062642a9b0265f173bec4abe57cb6018f98a42d693bffa3",
+            "idBlock": {
+                "blockName": "identificationBlock",
+                "blockLength": 1,
+                "error": "",
+                "warnings": [],
+                "valueBeforeDecode": "",
+                "isHexOnly": false,
+                "valueHex": "",
+                "tagClass": 1,
+                "tagNumber": 4,
+                "isConstructed": false
+            },
+            "lenBlock": {
+                "blockName": "lengthBlock",
+                "blockLength": 1,
+                "error": "",
+                "warnings": [],
+                "valueBeforeDecode": "",
+                "isIndefiniteForm": false,
+                "longFormUsed": false,
+                "length": 32
+            },
+            "valueBlock": {
+                "blockName": "OctetStringValueBlock",
+                "blockLength": 32,
+                "error": "",
+                "warnings": [],
+                "valueBeforeDecode": "",
+                "isIndefiniteForm": false,
+                "value": [],
+                "isHexOnly": true,
+                "valueHex": "b1c414a9ac76884de062642a9b0265f173bec4abe57cb6018f98a42d693bffa3",
+                "isConstructed": false
+            },
+            "name": "",
+            "optional": false
+        }
+    },
+    "genTime": "2023-12-20T09:17:53.000Z",
+    "serialNumber": "8845523090667931594",
+    "publicKey": {
+        "kty": "RSA",
+        "n": "x2N6e8FE3uZPFm-ecJuyufcEOiAW9hM_5tUYOjl04o5INa8GUzBde5cy7t9ODrqky3-OgkNeNy0pfE64LBa1A7wmnGSHB6g32adHD7wh8HzP1acezS0KYP1PbquJyWr0yQlm8HaX_H2ed7ix4b2qhvmvFkfZUALoJmvPXhLV2nUwxVcfm3hva5SVBlp95QlJOyAcNfxSvmIsdVakieQUAcNo4ne1uz81wFhjPnR7KfGDAEmf8w79JrJ0gVNzyh6PoOkcjLc982vheaMaPuLk1OAKMIqGYzWC8_USHkRO8zpn2v3Eq07f1avotz_lLsr6nuomCyEGCV-D70fAdB2WhQ",
+        "e": "AQAB"
+    }
+}…

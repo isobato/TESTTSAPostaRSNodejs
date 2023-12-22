@@ -6,8 +6,6 @@ const fs = require("fs");
 const path = require("path");
 const { Certificate } = pkijs;
 
-pkijs.setEngine("newEngine", crypto, new pkijs.CryptoEngine({ name: "", crypto, subtle: crypto.webcrypto.subtle }));
-
 async function timestampData(data, tsaUrl) {
   // Generate a hash of the data
   const hash = crypto.createHash("sha256").update(data).digest();
@@ -96,24 +94,21 @@ function parseTsaResponse(responseData) {
   };
 }
 
-async function validateCertificateChain(tsaCertBER, intermediateCertBER, rootCertBER) {
-  const rootCert = decodeCert(rootCertBER);
-  const intermediateCert = decodeCert(intermediateCertBER);
-  const tsaCert = decodeCert(tsaCertBER);
+async function validateTsaCertificates(tsaCertificate, rootCertPath, intermediateCertPath) {
+  // Load and parse the root and intermediate certificates
+  const rootCertPem = fs.readFileSync(rootCertPath).toString();
+  const intermediateCertPem = fs.readFileSync(intermediateCertPath).toString();
 
-  const crl1 = pkijs.CertificateRevocationList.fromBER(rootCertBER);
-  const ocsp1 = pkijs.BasicOCSPResponse.fromBER(rootCertBER);
+  const rootCertBER = decodePemToBER(rootCertPem);
+  const intermediateCertBER = decodePemToBER(intermediateCertPem);
 
-  const validationEngine = new pkijs.CertificateChainValidationEngine({
-    certs: [rootCa, intermediateCert, tsaCert],
-    trustedCerts: [rootCert],
-    crls: [crl1],
-    ocsps: [ocsp1],
-    trustedCerts: [rootCert],
-  });
+  // Convert base64-encoded TSA certificate to ArrayBuffer/BER
+  const tsaCertBER = Buffer.from(tsaCertificate, "base64").buffer;
 
-  const validationResult = await validationEngine.verify();
-  return validationResult.result; // true if valid, false otherwise
+  // Verify the certificate chain
+  const isValid = await validateCertificateChain(tsaCertBER, intermediateCertBER, rootCertBER);
+
+  return isValid; // Boolean indicating whether the TSA's certificate is valid
 }
 
 function decodePemToBER(pem) {
@@ -131,26 +126,74 @@ function decodePemToBER(pem) {
   return new Uint8Array(der).buffer;
 }
 
+async function validateCertificateChain(tsaCertBER, intermediateCertBER, rootCertBER) {
+  const rootCert = decodeCert(rootCertBER);
+  const intermediateCert = decodeCert(intermediateCertBER);
+  const tsaCert = decodeCert(tsaCertBER);
+
+  const crlUrl = getCrlUrlFromCert(intermediateCert);
+  const crl1raw = getCrlFromUrl(crlUrl);
+  const crl1 = new pkijs.CertificateRevocationList({ schema: crl1raw.result });
+
+  const intermediateCertStatus = checkCertificateStatus(intermediateCert, crl1);
+  const tsaCertStatus = checkCertificateStatus(tsaCert, crl1);
+
+  const hasInvalid = [intermediateCertStatus, tsaCertStatus].some((x) => !x.isValid);
+
+  return !hasInvalid; // true if valid, false otherwise
+}
+
 function decodeCert(ber) {
   const asn1 = asn1js.fromBER(ber);
   return new Certificate({ schema: asn1.result });
 }
 
-async function validateTsaCertificates(tsaCertificate, rootCertPath, intermediateCertPath) {
-  // Load and parse the root and intermediate certificates
-  const rootCertPem = fs.readFileSync(rootCertPath).toString();
-  const intermediateCertPem = fs.readFileSync(intermediateCertPath).toString();
+function getCrlUrlFromCert(intermediateCert) {
+  let crlUrls;
+  const crlDistPointsExt = intermediateCert.extensions.find((ext) => ext.extnID === "2.5.29.31");
+  if (crlDistPointsExt) {
+    const distributionPoints = crlDistPointsExt.parsedValue.distributionPoints;
+    const flattenedUrls = distributionPoints.flatMap((dp) => dp.distributionPoint.flatMap((point) => point.value));
+    crlUrls = flattenedUrls.filter((url) => url.startsWith("http"));
+    console.log(crlUrls); // These are the CRL URLs
+  }
 
-  const rootCertBER = decodePemToBER(rootCertPem);
-  const intermediateCertBER = decodePemToBER(intermediateCertPem);
+  return crlUrls[0];
+}
 
-  // Convert base64-encoded TSA certificate to ArrayBuffer/BER
-  const tsaCertBER = Buffer.from(tsaCertificate, "base64").buffer;
+async function getCrlFromUrl(url) {
+  // Download the CRL
+  const response = await axios.get(url, { responseType: "arraybuffer" });
+  const crlArrayBuffer = response.data;
 
-  // Verify the certificate chain
-  const isValid = await validateCertificateChain(tsaCertBER, intermediateCertBER, rootCertBER);
+  // Parse the CRL
+  return asn1js.fromBER(crlArrayBuffer);
+}
 
-  return isValid; // Boolean indicating whether the TSA's certificate is valid
+function checkCertificateStatus(certificate, crl) {
+  try {
+    // Check if the certificate is expired
+    const currentDate = new Date();
+    const notBefore = certificate.notBefore.value;
+    const notAfter = certificate.notAfter.value;
+
+    if (currentDate < notBefore || currentDate > notAfter) {
+      return { isValid: false, reason: "Certificate is expired" };
+    }
+
+    // Check revocation status
+    const isRevoked =
+      crl.revokedCertificates?.some((revokedCert) => revokedCert.userCertificate.isEqual(certificate.serialNumber)) ||
+      false;
+
+    return {
+      isValid: !isRevoked,
+      reason: isRevoked ? "Certificate is revoked" : "Certificate is valid",
+    };
+  } catch (error) {
+    console.error("Error checking certificate status:", error);
+    return { isValid: null, reason: "Error checking certificate status" };
+  }
 }
 
 // Example usage
@@ -169,6 +212,47 @@ const tsaUrl = "http://test-tsa.ca.posta.rs/timestamp"; // Replace with the actu
     console.error("Error:", error);
   }
 })();
+
+// async function isCertificateRevoked(certificateSerialNumber, crlUrl) {
+//   try {
+//     // Download the CRL
+//     const response = await axios.get(crlUrl, { responseType: "arraybuffer" });
+//     const crlArrayBuffer = response.data;
+
+//     // Parse the CRL
+//     const crlAsn1 = asn1js.fromBER(crlArrayBuffer);
+//     const crl = new pkijs.CertificateRevocationList({ schema: crlAsn1.result });
+
+//     // Check if the CRL contains revoked certificates
+//     if (crl.revokedCertificates) {
+//       // Check if the certificate's serial number is in the CRL
+//       const isRevoked = crl.revokedCertificates.some((revokedCert) =>
+//         revokedCert.userCertificate.isEqual(certificateSerialNumber)
+//       );
+
+//       return isRevoked;
+//     } else {
+//       // No revoked certificates in the CRL
+//       return false;
+//     }
+//   } catch (error) {
+//     console.error("Error checking revocation status:", error);
+//     return null;
+//   }
+// }
+
+// // Example usage
+// const serialNumber = "44EEE74019DA3A8525"; // Replace with the actual serial number in hex
+// const crlUrl = "http://repository.ca.posta.rs/crl/TEST2018CARoot-Novo.crl"; // Replace with the actual CRL URL
+// isCertificateRevoked(serialNumber, crlUrl).then((isRevoked) => {
+//   if (isRevoked === null) {
+//     console.log("Could not determine revocation status");
+//   } else if (isRevoked) {
+//     console.log("Certificate is revoked");
+//   } else {
+//     console.log("Certificate is not revoked");
+//   }
+// });
 
 // // Usage example
 // const rootCertPath = path.join(__dirname, "TEST2018CARoot-Novo.pem");
